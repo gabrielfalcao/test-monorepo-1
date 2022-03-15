@@ -20,10 +20,10 @@ tput clear
 #
 # TIP: you might want to change the line below to "set -ex" to have
 # bash print every single command
+set -e
 #########################################################################
 
-set -e
-
+#########################################################################
 #  ____   ____ ____  ___ ____ _____
 # / ___| / ___|  _ \|_ _|  _ \_   _|
 # \___ \| |   | |_) || || |_) || |
@@ -34,18 +34,28 @@ set -e
 #  | ||  \| | |_) | | | | | | \___ \
 #  | || |\  |  __/| |_| | | |  ___) |
 # |___|_| \_|_|    \___/  |_| |____/
-FINAL_MONOREPO_BRANCH_TARGET=main  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
-MONOREPO_PATH=$(pwd)
-TMP_DIR=$(mktemp -d)
-OWNER_NAME=gabrielfalcao
-PROJECT_NAME=lettuce # upstream project name, such as vi or hybrid
+
+FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH="yes"   # set to "yes"
+MAIN_INTEGRATION_BRANCH_NAME="main"  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
+MONOREPO_PATH="$(pwd)"
+TMP_DIR="$(mktemp -d)"
+
+# <upstream project info>
+OWNER_NAME="gabrielfalcao"
+PROJECT_NAME="lettuce"
 UPSTREAMS_MAIN_BRANCH_NAME=master  # this should be "main" for newer github projects or "master" for old ones :/
-INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
+# </upstream project info>
+
+HISTORY_INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
 TMP_REMOTE="git@github.com:${OWNER_NAME}/${PROJECT_NAME}-pre-monorepo.git"
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 BENCHMARK_LOG="${TMP_DIR}/benchmark.txt"
+#########################################################################
 
+
+
+#########################################################################
 #  _  _ ___ _    ___ ___ ___
 # | || | __| |  | _ \ __| _ \
 # | __ | _|| |__|  _/ _||   /
@@ -55,7 +65,7 @@ BENCHMARK_LOG="${TMP_DIR}/benchmark.txt"
 # | _|| |_| | .` | (__  | |  | | (_) | .` \__ \
 # |_|  \___/|_|\_|\___| |_| |___\___/|_|\_|___/
 function integration_branch_already_exists() {
-    git branch --list | grep "[[:space:]]\+\b${INTEGRATION_BRANCH_NAME}\$" > /dev/null
+    git branch --list | grep "[[:space:]]\+\b${HISTORY_INTEGRATION_BRANCH_NAME}\$" > /dev/null
 }
 function temporary_remote_already_exists_in_monorepo() {
     git remote show | grep "^${TMP_REMOTE_NAME}\$" > /dev/null
@@ -64,7 +74,9 @@ function determine_push_url_of_git_remote() {
     name="$@"
     git remote show -n "${name}" | grep -i 'push.*url' | awk '{ print $NF }'
 }
+#########################################################################
 
+#########################################################################
 #  ___   _   ___ ___ _______   __
 # / __| /_\ | __| __|_   _\ \ / /
 # \__ \/ _ \| _|| _|  | |  \ V /
@@ -89,12 +101,10 @@ if ! which git-filter-repo > /dev/null; then
     echo -e "\tbrew install git-filter-repo"
     exit 1
 fi
+#########################################################################
 
 
-
-###############################################################################################
-
-
+#########################################################################
 #
 #    _   ___ _____ _   _  _   _
 #   /_\ / __|_   _| | | |/_\ | |
@@ -161,7 +171,7 @@ if integration_branch_already_exists; then
 
     # For example config files for the CI, gitignore, linter configs,
     # etc.
-    git checkout ${INTEGRATION_BRANCH_NAME}
+    git checkout ${HISTORY_INTEGRATION_BRANCH_NAME}
 
     # Because this script was tested in a contrived environment I
     # could not find anything interesting to do, so I'm just deleting
@@ -174,7 +184,7 @@ if integration_branch_already_exists; then
     git add .
     git commit -am "fix(${PROJECT_NAME}): downstream changes required for migration"
 else # Branch does not exist yet, let's create it
-    git branch ${INTEGRATION_BRANCH_NAME}
+    git branch ${HISTORY_INTEGRATION_BRANCH_NAME}
 
     # This script was originally designed to work only with an
     # existing integration branch, but I've added some placeholder logic
@@ -195,14 +205,25 @@ git merge --allow-unrelated-histories --no-commit ${TMP_REMOTE_NAME}/${UPSTREAMS
 git commit -am "Migrated ${OWNER_NAME}/${PROJECT_NAME} into the monorepo."
 echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
 successfully imported into the monorepo under the integration branch:
-${INTEGRATION_BRANCH_NAME}"
+${HISTORY_INTEGRATION_BRANCH_NAME}"
 
-# Step 9: Go back to monorepo branch: main
-git checkout ${FINAL_MONOREPO_BRANCH_TARGET}
+# Step 9: Merge the integration branch into the main integration
+#         branch of the upstream project in the monorepo
+#         (i.e.: $MAIN_INTEGRATION_BRANCH_NAME)
+#
+if [ "${FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH}" == "yes" ]; then
+    git checkout ${MAIN_INTEGRATION_BRANCH_NAME}
+    git merge ${HISTORY_INTEGRATION_BRANCH_NAME}
+    echo "Hurray! The upstream code has been successfully incorported into the local '${MAIN_INTEGRATION_BRANCH_NAME}' branch."
+    echo "Now inspect your history with 'git log' to confirm that it looks good."
+    echo "Once that's done, run 'git push'."
+else
+    echo "Now inspect your history with 'git log' to confirm that the migration worked fine"
+    echo "Once that's done, switch to the main branch of the monorepo and run 'git merge'."
+    echo
+    echo "Here is the exact list of commands:"
 
-# Step 10: Merge the integration branch into main
-git merge ${INTEGRATION_BRANCH_NAME}
-
-# And we're done automating the steps, now we explain the next (manual) steps
-echo "Now inspect your history, if everything looks fine, push to github"
-echo "so that you can browse the final product and show of to your girlfriends"
+    echo "git checkout ${MAIN_INTEGRATION_BRANCH_NAME}"
+    echo "git merge ${HISTORY_INTEGRATION_BRANCH_NAME}"
+fi
+#########################################################################
