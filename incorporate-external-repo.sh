@@ -127,7 +127,7 @@ git push --force --all temp-remote
 pushd "${MONOREPO_PATH}"
 
 # Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo. WARNING: if a remote with $TMP_REMOTE_NAME already exists it will be replaced!
-if ! temporary_remote_already_exists_in_monorepo; then
+if temporary_remote_already_exists_in_monorepo; then
     existing_tmp_remote=$(determine_push_url_of_git_remote "${TMP_REMOTE_NAME}")
     if  [ "${existing_tmp_remote}" != "${TMP_REMOTE}" ]; then
         echo "WARNING: Replacing remote url from '$existing_tmp_remote' to '$TMP_REMOTE'"
