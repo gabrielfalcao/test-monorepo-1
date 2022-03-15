@@ -16,15 +16,47 @@ if ! which git-filter-repo > /dev/null; then
     exit 1
 fi
 
+function branch_exists() {
+    name="$@"
+    git branch --list | grep "[[:space:]]\+\b${name}\$" > /dev/null
+}
+
+
+#   ___ ___  _  _ ___ ___ ___
+#  / __/ _ \| \| | __|_ _/ __|
+# | (_| (_) | .` | _| | | (_ |
+#  \___\___/|_|\_|_| |___\___|
+#  ___  _   ___    _   __  __ ___
+# | _ \/_\ | _ \  /_\ |  \/  / __|
+# |  _/ _ \|   / / _ \| |\/| \__ \
+# |_|/_/ \_\_|_\/_/ \_\_|  |_|___/
+
+# NOTE: Preferably on something other than the `main` branch
+FINAL_MONOREPO_BRANCH_TARGET=main
 MONOREPO_PATH=$(pwd)
 TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
-PROJECT_NAME=lettuce
+PROJECT_NAME=lettuce # upstream project name, such as vi or hybrid
 INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
 TMP_REMOTE="git@github.com:${OWNER_NAME}/${PROJECT_NAME}-pre-monorepo.git"
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
+
+
+#  ___ _____ ___ ___
+# / __|_   _| __| _ \
+# \__ \ | | | _||  _/
+# |___/ |_| |___|_|
+#      _____   __
+#     | _ ) \ / /
+#     | _ \\ V /
+#     |___/ |_|
+#  ___ _____ ___ ___
+# / __|_   _| __| _ \
+# \__ \ | | | _||  _/
+# |___/ |_| |___|_|
+
 # Step 1: Freshly clone ${PROJECT_NAME} in a tmp dir and switch to that dir
 git clone git@github.com:${OWNER_NAME}/${PROJECT_NAME}.git ${TMP_CLONE_PATH}
 pushd "${TMP_CLONE_PATH}"
@@ -61,25 +93,52 @@ pushd "${MONOREPO_PATH}"
 # Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo
 git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
 
-# Step 6: Create integration branch
-git branch --force ${INTEGRATION_BRANCH_NAME}
+# Step 6: If integration branch exists
+if branch_exists ${INTEGRATION_BRANCH_NAME}; then
 
-# Step 7: Go to integration branch
-git checkout ${INTEGRATION_BRANCH_NAME}
+    # Go to integration branch and perform any work you deem necessary prior to integrating "pulling" the code from the upstream remote (i.e.: $TMP_REMOTE)
 
-# Step 8: *Magic Step* -> `--allow-unrelated-histories`
+    # For example config files for the CI, gitignore, linter configs,
+    # etc.
+    git checkout ${INTEGRATION_BRANCH_NAME}
+
+    # Because this script was tested in a contrived environment I
+    # could not find anything interesting to do, so I'm just deleting
+    # the target project path and appending the project name to a text
+    # file containing the $PROJECT_NAME
+    rm -rf projects/${PROJECT_NAME}
+    echo -e "\n${PROJECT_NAME}" >> projects/with-pre-existing-integration-branch.txt
+
+    # Finally, we make a commit with the pre-integration changes.
+    git commit -am "fix(${PROJECT_NAME}): downstream changes required for migration"
+else # Branch does not exist yet, let's create it
+    git branch ${INTEGRATION_BRANCH_NAME}
+
+    # This script was originally designed to work only with an
+    # existing integration branch, but I've added some placeholder logic
+    # here for the sake of illustrating a scenario where it *does not*
+    # exist yet.
+
+    # Again, this is a contrived example, so let's just add the $PROJECT_NAME to some file
+    echo -e "\n${PROJECT_NAME}" >> projects/without-pre-existing-integration-branch.txt
+fi
+
+
+# Step 7: *Magic Step* -> `--allow-unrelated-histories`
 git merge --squash --allow-unrelated-histories ${TMP_REMOTE_NAME}/master
+echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
+successfully imported into the monorepo under the integration branch:
+${INTEGRATION_BRANCH_NAME}"
 
-# Step 9: Go back to monorepo's main branch
-git checkout main
+# Step 8: Go back to monorepo branch: main
+git checkout ${FINAL_MONOREPO_BRANCH_TARGET}
 
-# Step 10: Merge the integration branch into main
+# Step 9: Merge the integration branch into main
 git merge ${INTEGRATION_BRANCH_NAME}
 
-# Step 11: Explain the next manual steps
+# Step 10: Explain the next manual steps
 echo "Now inspect your history, if everything looks fine, push to github"
 echo "so that you can browse the final product and show of to your girlfriends"
-#    Preferably on something other than the `main` branch
 # 5. push up that branch that has the new history and take another look at it
 # 6. git checkout main \
 #      && git merge my-branch-with-the-history-that-we-just-pulled-in \
