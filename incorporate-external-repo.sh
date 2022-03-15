@@ -41,8 +41,12 @@ BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
 function integration_branch_already_exists() {
     git branch --list | grep "[[:space:]]\+\b${INTEGRATION_BRANCH_NAME}\$" > /dev/null
 }
-function temporary_remote_already_exists() {
+function temporary_remote_already_exists_in_monorepo() {
     git remote show | grep "^${TMP_REMOTE_NAME}\$" > /dev/null
+}
+function determine_push_url_of_git_remote() {
+    name="$@"
+    git remote show -n "${name}" | grep -i 'push.*url' | awk '{ print $NF }'
 }
 
 #  ___   _   ___ ___ _______   __
@@ -115,19 +119,21 @@ time git filter-repo \
     | tee ${BENCHMARK_LOG}  # Benchmarking to test the hypothesis that the command might run faster if the python code within the `--commit-callback` command handles errors properly.
 
 # Step 3: Push to temporary remote
-if ! temporary_remote_already_exists; then
-    git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
-fi
-git push --force --all ${TMP_REMOTE_NAME}
-
+git remote add temp-remote ${TMP_REMOTE}
+git push --force --all temp-remote
 
 # Step 4: Go to monorepo
 pushd "${MONOREPO_PATH}"
 
-# Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo
+# Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo. WARNING: if a remote with $TMP_REMOTE_NAME already exists it will be replaced!
+if ! temporary_remote_already_exists_in_monorepo; then
+    existing_tmp_remote=$(determine_push_url_of_git_remote "${TMP_REMOTE_NAME}")
+    if  [ "${existing_tmp_remote}" != "${TMP_REMOTE}" ]; then
+        echo "WARNING: Replacing remote url from '$existing_tmp_remote' to '$TMP_REMOTE'"
+    fi
+fi
 
 git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
-
 # Step 6: If integration branch exists
 if integration_branch_already_exists; then
 
