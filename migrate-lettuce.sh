@@ -7,8 +7,8 @@
 set -ex
 
 TMP_DIR=$(mktemp -d)
+OWNER_NAME=gabrielfalcao
 PROJECT_NAME=lettuce
-OWNER_NAME=${OWNER_NAME}
 INTEGRATION_BRANCH_NAME=integrate-${PROJECT_NAME}
 TMP_REMOTE=git@github.com:${OWNER_NAME}/lettuce-pre-monorepo.git
 
