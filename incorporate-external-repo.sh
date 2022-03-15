@@ -1,30 +1,40 @@
 #!/usr/bin/env bash
-#
-# WARNING
-#
-# THIS SCRIPT SHOULD BE RUN ONLY DURING A CODE FREEZE!!
-#
-# MAKE SURE YOU UNDERSTAND EVERYTHING IT DOES BEFORE RUNNING IT
-# BECAUSE EVEN THOUGH IT AUTOMATES A LOT OF STUFF, IF ANY STEP FAILS
-# YOU WILL NEED TO INTERVENE MANUALLY
+tput clear
 #
 # Make sure you have the following tools installed:
 # - Git version 2.35 or newer
 # - The git-filter-repo tool: brew install git-filter-repo
-tput clear
-set -ex
 
-#   ___ ___  _  _ ___ ___ ___
-#  / __/ _ \| \| | __|_ _/ __|
-# | (_| (_) | .` | _| | | (_ |
-#  \___\___/|_|\_|_| |___\___|
-#  ___  _   ___    _   __  __ ___
-# | _ \/_\ | _ \  /_\ |  \/  / __|
-# |  _/ _ \|   / / _ \| |\/| \__ \
-# |_|/_/ \_\_|_\/_/ \_\_|  |_|___/
+#########################################################################
+# __        ___    ____  _   _ ___ _   _  ____
+# \ \      / / \  |  _ \| \ | |_ _| \ | |/ ___|
+#  \ \ /\ / / _ \ | |_) |  \| || ||  \| | |  _
+#   \ V  V / ___ \|  _ <| |\  || || |\  | |_| |
+#    \_/\_/_/   \_\_| \_\_| \_|___|_| \_|\____|
+#
+# THIS SCRIPT SHOULD BE RUN ONLY DURING A CODE FREEZE!!
+#
+# MAKE SURE YOU UNDERSTAND EVERYTHING IT DOES BEFORE RUNNING IT
+# BECAUSE EVEN THOUGH IT AUTOMATES A LOT OF STUFF AND YOU WILL NEED TO
+# INTERVENE MANUALLY IF ANY STEP FAILS
+#
+# TIP: you might want to change the line below to "set -ex" to have
+# bash print every single command
+#########################################################################
 
-# NOTE: Preferably on something other than the `main` branch
-FINAL_MONOREPO_BRANCH_TARGET=main
+set -e
+
+#  ____   ____ ____  ___ ____ _____
+# / ___| / ___|  _ \|_ _|  _ \_   _|
+# \___ \| |   | |_) || || |_) || |
+#  ___) | |___|  _ < | ||  __/ | |
+# |____/ \____|_| \_\___|_|    |_|
+#  ___ _   _ ____  _   _ _____ ____
+# |_ _| \ | |  _ \| | | |_   _/ ___|
+#  | ||  \| | |_) | | | | | | \___ \
+#  | || |\  |  __/| |_| | | |  ___) |
+# |___|_| \_|_|    \___/  |_| |____/
+FINAL_MONOREPO_BRANCH_TARGET=main  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
 MONOREPO_PATH=$(pwd)
 TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
@@ -196,7 +206,3 @@ git merge ${INTEGRATION_BRANCH_NAME}
 # And we're done automating the steps, now we explain the next (manual) steps
 echo "Now inspect your history, if everything looks fine, push to github"
 echo "so that you can browse the final product and show of to your girlfriends"
-# 5. push up that branch that has the new history and take another look at it
-# 6. git checkout main \
-#      && git merge my-branch-with-the-history-that-we-just-pulled-in \
-#      && git push
