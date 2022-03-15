@@ -154,6 +154,7 @@ if integration_branch_already_exists; then
     echo -e "\n${PROJECT_NAME}" >> projects/with-pre-existing-integration-branch.txt
 
     # Finally, we make a commit with the pre-integration changes.
+    git add .
     git commit -am "fix(${PROJECT_NAME}): downstream changes required for migration"
 else # Branch does not exist yet, let's create it
     git branch ${INTEGRATION_BRANCH_NAME}
@@ -165,6 +166,10 @@ else # Branch does not exist yet, let's create it
 
     # Again, this is a contrived example, so let's just add the $PROJECT_NAME to some file
     echo -e "\n${PROJECT_NAME}" >> projects/without-pre-existing-integration-branch.txt
+
+    # Finally, we make a commit with the pre-integration changes.
+    git add .
+    git commit -am "fix(${PROJECT_NAME}): downstream changes required for migration"
 fi
 
 
