@@ -24,6 +24,7 @@ INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
 TMP_REMOTE="git@github.com:${OWNER_NAME}/lettuce-pre-monorepo.git"
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
+BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
 # Step 1: Freshly clone ${PROJECT_NAME} in a tmp dir and switch to that dir
 git clone git@github.com:${OWNER_NAME}/${PROJECT_NAME}.git ${TMP_CLONE_PATH}
 pushd "${TMP_CLONE_PATH}"
@@ -46,7 +47,8 @@ time git filter-repo \
     --path-rename :projects/${PROJECT_NAME}/ \
     --path-rename projects/${PROJECT_NAME}/.travis.yml:.artifacts/${PROJECT_NAME}/.travis.yml \
     --path-rename projects/${PROJECT_NAME}/tox.ini:.artifacts/${PROJECT_NAME}/tox.ini \
-    --path-rename projects/${PROJECT_NAME}/.github/:.artifacts/${PROJECT_NAME}/.github/
+    --path-rename projects/${PROJECT_NAME}/.github/:.artifacts/${PROJECT_NAME}/.github/ \
+    | tee ${BENCHMARK_LOG}  # Benchmarking to test the hypothesis that the command might run faster if the python code within the `--commit-callback` command handles errors properly.
 
 # Step 3: Push to temporary remote
 git remote add temp-remote $TMP_REMOTE
