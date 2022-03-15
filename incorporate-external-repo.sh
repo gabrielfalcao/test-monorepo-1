@@ -52,7 +52,7 @@ time git filter-repo \
 
 # Step 3: Push to temporary remote
 git remote add temp-remote $TMP_REMOTE
-git push -f -a temp-remote
+git push --force --all temp-remote
 
 
 # Step 4: Go to monorepo
