@@ -171,9 +171,10 @@ git fetch ${TMP_REMOTE_NAME} ${UPSTREAMS_MAIN_BRANCH_NAME}
 
 # Step 7: If integration branch exists
 if integration_branch_already_exists; then
-
-    # Go to integration branch and perform any work you deem necessary prior to integrating "pulling" the code from the upstream remote (i.e.: $TMP_REMOTE)
-
+    # Here we're switching to the existing integration branch and
+    # perform any work you deem necessary prior to integrating
+    # "pulling" the code from the upstream remote (i.e.: $TMP_REMOTE)
+    #
     # For example config files for the CI, gitignore, linter configs,
     # etc.
     git checkout ${HISTORY_INTEGRATION_BRANCH_NAME}
@@ -189,7 +190,7 @@ if integration_branch_already_exists; then
     git add .
     git commit -am "fix(${PROJECT_NAME}): downstream changes required for migration"
 else # Branch does not exist yet, let's create it
-    git branch ${HISTORY_INTEGRATION_BRANCH_NAME}
+    git checkout -b ${HISTORY_INTEGRATION_BRANCH_NAME}
 
     # This script was originally designed to work only with an
     # existing integration branch, but I've added some placeholder logic
