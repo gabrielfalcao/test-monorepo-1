@@ -45,6 +45,21 @@ function remote_exists() {
     git remote show | grep "^${TMP_REMOTE_NAME}\$" > /dev/null
 }
 
+#  ___   _   ___ ___ _______   __
+# / __| /_\ | __| __|_   _\ \ / /
+# \__ \/ _ \| _|| _|  | |  \ V /
+# |___/_/ \_\_| |___| |_|   |_|
+#   ___ _  _ ___ ___ _  _____
+#  / __| || | __/ __| |/ / __|
+# | (__| __ | _| (__| ' <\__ \
+#  \___|_||_|___\___|_|\_\___/
+
+if ! git diff --quiet; then
+    echo "The Git tree is dirty!!"
+    echo "Make sure that to commit AND push all changes before running this migration script."
+    exit 1
+fi
+
 if ! which git-filter-repo > /dev/null; then
     echo -e "git-filter-repo doesn't seem to be installed.\n"
     echo "To install it you can follow the instructions in the link below:"
@@ -54,6 +69,7 @@ if ! which git-filter-repo > /dev/null; then
     echo -e "\tbrew install git-filter-repo"
     exit 1
 fi
+
 
 
 ###############################################################################################
