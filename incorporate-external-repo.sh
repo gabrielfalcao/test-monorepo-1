@@ -21,7 +21,7 @@ TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
 PROJECT_NAME=lettuce
 INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
-TMP_REMOTE="git@github.com:${OWNER_NAME}/lettuce-pre-monorepo.git"
+TMP_REMOTE="git@github.com:${OWNER_NAME}/${PROJECT_NAME}-pre-monorepo.git"
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
@@ -51,7 +51,7 @@ time git filter-repo \
     | tee ${BENCHMARK_LOG}  # Benchmarking to test the hypothesis that the command might run faster if the python code within the `--commit-callback` command handles errors properly.
 
 # Step 3: Push to temporary remote
-git remote add temp-remote $TMP_REMOTE
+git remote add temp-remote ${TMP_REMOTE}
 git push --force --all temp-remote
 
 
@@ -59,7 +59,7 @@ git push --force --all temp-remote
 pushd "${MONOREPO_PATH}"
 
 # Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo
-git remote add ${TMP_REMOTE_NAME}
+git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
 
 # Step 6: Create integration branch
 git branch -D ${INTEGRATION_BRANCH_NAME}
