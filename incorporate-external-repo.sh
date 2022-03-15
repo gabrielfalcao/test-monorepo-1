@@ -25,6 +25,7 @@ MONOREPO_PATH=$(pwd)
 TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
 PROJECT_NAME=lettuce # upstream project name, such as vi or hybrid
+UPSTREAMS_MAIN_BRANCH_NAME=master  # this should be "main" for newer github projects or "master" for old ones :/
 INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
 TMP_REMOTE="git@github.com:${OWNER_NAME}/${PROJECT_NAME}-pre-monorepo.git"
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
@@ -168,7 +169,7 @@ fi
 
 
 # Step 7: *Magic Step* -> `--allow-unrelated-histories`
-git merge --allow-unrelated-histories ${TMP_REMOTE_NAME}/${FINAL_MONOREPO_BRANCH_TARGET}
+git merge --allow-unrelated-histories ${TMP_REMOTE_NAME}/${UPSTREAMS_MAIN_BRANCH_NAME}
 echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
 successfully imported into the monorepo under the integration branch:
 ${INTEGRATION_BRANCH_NAME}"
