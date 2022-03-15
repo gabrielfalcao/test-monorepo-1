@@ -181,7 +181,8 @@ fi
 
 
 # Step 8: *Magic Step* -> `--allow-unrelated-histories`
-git merge --allow-unrelated-histories ${TMP_REMOTE_NAME}/${UPSTREAMS_MAIN_BRANCH_NAME}
+git merge --allow-unrelated-histories --no-commit ${TMP_REMOTE_NAME}/${UPSTREAMS_MAIN_BRANCH_NAME}
+git commit -am "Migrated ${OWNER_NAME}/${PROJECT_NAME} into the monorepo."
 echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
 successfully imported into the monorepo under the integration branch:
 ${INTEGRATION_BRANCH_NAME}"
