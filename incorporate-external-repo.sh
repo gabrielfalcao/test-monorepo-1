@@ -43,8 +43,8 @@ time git filter-repo \
     commit.message += (b'\nMigrated to ${OWNER_NAME}/test-monorepo-1 from ${OWNER_NAME}/${PROJECT_NAME}@%s'
         % commit.original_id[0:7])
     " \
-    --path-rename projects/${PROJECT_NAME}/tests/:tests/${PROJECT_NAME}/ \
     --path-rename :projects/${PROJECT_NAME}/ \
+    --path-rename projects/${PROJECT_NAME}/tests/:tests/${PROJECT_NAME}/ \
     --path-rename projects/${PROJECT_NAME}/.travis.yml:.artifacts/${PROJECT_NAME}/.travis.yml \
     --path-rename projects/${PROJECT_NAME}/tox.ini:.artifacts/${PROJECT_NAME}/tox.ini \
     --path-rename projects/${PROJECT_NAME}/.github/:.artifacts/${PROJECT_NAME}/.github/ \
