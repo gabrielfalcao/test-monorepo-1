@@ -4,6 +4,10 @@
 #
 # THIS SCRIPT SHOULD BE RUN ONLY DURING A CODE FREEZE!!
 #
+# MAKE SURE YOU UNDERSTAND EVERYTHING IT DOES BEFORE RUNNING IT
+# BECAUSE EVEN THOUGH IT AUTOMATES A LOT OF STUFF, IF ANY STEP FAILS
+# YOU WILL NEED TO INTERVENE MANUALLY
+#
 # Make sure you have the following tools installed:
 # - Git version 2.35 or newer
 # - The git-filter-repo tool: brew install git-filter-repo
