@@ -9,19 +9,6 @@
 # - The git-filter-repo tool: brew install git-filter-repo
 set -ex
 
-if ! which git-filter-repo > /dev/null; then
-    echo -e "git-filter-repo doesn't seem to be installed.\n"
-    echo "To install it, follow the instructions in the link below:"
-    echo "https://github.com/newren/git-filter-repo/blob/main/INSTALL.md"
-    exit 1
-fi
-
-function branch_exists() {
-    name="$@"
-    git branch --list | grep "[[:space:]]\+\b${name}\$" > /dev/null
-}
-
-
 #   ___ ___  _  _ ___ ___ ___
 #  / __/ _ \| \| | __|_ _/ __|
 # | (_| (_) | .` | _| | | (_ |
@@ -43,19 +30,48 @@ TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
 
+#  _  _ ___ _    ___ ___ ___
+# | || | __| |  | _ \ __| _ \
+# | __ | _|| |__|  _/ _||   /
+# |_||_|___|____|_| |___|_|_\
+#  ___ _   _ _  _  ___ _____ ___ ___  _  _ ___
+# | __| | | | \| |/ __|_   _|_ _/ _ \| \| / __|
+# | _|| |_| | .` | (__  | |  | | (_) | .` \__ \
+# |_|  \___/|_|\_|\___| |_| |___\___/|_|\_|___/
+function branch_exists() {
+    git branch --list | grep "[[:space:]]\+\b${INTEGRATION_BRANCH_NAME}\$" > /dev/null
+}
+function remote_exists() {
+    git remote show | grep "^${TMP_REMOTE_NAME}\$" > /dev/null
+}
 
-#  ___ _____ ___ ___
-# / __|_   _| __| _ \
-# \__ \ | | | _||  _/
-# |___/ |_| |___|_|
-#      _____   __
-#     | _ ) \ / /
-#     | _ \\ V /
-#     |___/ |_|
-#  ___ _____ ___ ___
-# / __|_   _| __| _ \
-# \__ \ | | | _||  _/
-# |___/ |_| |___|_|
+if ! which git-filter-repo > /dev/null; then
+    echo -e "git-filter-repo doesn't seem to be installed.\n"
+    echo "To install it you can follow the instructions in the link below:"
+    echo "https://github.com/newren/git-filter-repo/blob/main/INSTALL.md"
+    echo ""
+    echo "Tip: Mac users can simply run:"
+    echo -e "\tbrew install git-filter-repo"
+    exit 1
+fi
+
+
+###############################################################################################
+
+
+#
+#    _   ___ _____ _   _  _   _
+#   /_\ / __|_   _| | | |/_\ | |
+#  / _ \ (__  | | | |_| / _ \| |__
+# /_/ \_\___| |_|  \___/_/ \_\____|
+#  __  __ _  ___ ___    _ _____ _  ___  _  _
+# |  \/  (_)/ __| _ \  /_\_   _(_)/ _ \| \| |
+# | |\/| | | (_ |   / / _ \| | | | (_) | .` |
+# |_|  |_|_|\___|_|_\/_/ \_\_| |_|\___/|_|\_|
+#  _    ___   ___ _  ___
+# | |  / _ \ / __(_)/ __|
+# | |_| (_) | (_ | | (__
+# |____\___/ \___|_|\___|
 
 # Step 1: Freshly clone ${PROJECT_NAME} in a tmp dir and switch to that dir
 git clone git@github.com:${OWNER_NAME}/${PROJECT_NAME}.git ${TMP_CLONE_PATH}
