@@ -16,19 +16,22 @@ if ! which git-filter-repo > /dev/null; then
     exit 1
 fi
 
+MONOREPO_PATH=$(pwd)
 TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
 PROJECT_NAME=lettuce
 INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
 TMP_REMOTE="git@github.com:${OWNER_NAME}/lettuce-pre-monorepo.git"
+TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
-# Step 1: Freshly clone ${PROJECT_NAME} in a tmp dir
+# Step 1: Freshly clone ${PROJECT_NAME} in a tmp dir and switch to that dir
 git clone git@github.com:${OWNER_NAME}/${PROJECT_NAME}.git ${TMP_CLONE_PATH}
-
+pushd "${TMP_CLONE_PATH}"
 # Step 2: Rewrite history ✊ via `git filter-repo` command.
 #         First reword every commit whose python code executes *without error*. The callback uses a regex to match #1337 references change to ${OWNER_NAME}/test-monorepo-1#1337.
 #         Next move all files  ${PROJECT_NAME} files under projects/${PROJECT_NAME}/ within the monorepo.
 #
+
 time git filter-repo \
 	--commit-callback "
     commit.message = re.sub(
@@ -49,11 +52,12 @@ time git filter-repo \
 git remote add temp-remote $TMP_REMOTE
 git push -f -a temp-remote
 
+
 # Step 4: Go to monorepo
-cd test-monorepo-1
+pushd "${MONOREPO_PATH}"
 
 # Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo
-git remote add ${PROJECT_NAME}-pre-monorepo
+git remote add ${TMP_REMOTE_NAME}
 
 # Step 6: Create integration branch
 git branch -D ${INTEGRATION_BRANCH_NAME}
@@ -63,7 +67,7 @@ git branch ${INTEGRATION_BRANCH_NAME}
 git checkout ${INTEGRATION_BRANCH_NAME}
 
 # Step 8: *Magic Step* -> `--allow-unrelated-histories`
-git merge --squash --allow-unrelated-histories ${PROJECT_NAME}-pre-monorepo/master
+git merge --squash --allow-unrelated-histories ${TMP_REMOTE_NAME}/master
 
 # Step 9: Go back to monorepo's main branch
 git checkout main
