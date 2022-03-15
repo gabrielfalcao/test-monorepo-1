@@ -19,11 +19,11 @@ fi
 TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
 PROJECT_NAME=lettuce
-INTEGRATION_BRANCH_NAME=integrate-${PROJECT_NAME}
-TMP_REMOTE=git@github.com:${OWNER_NAME}/lettuce-pre-monorepo.git
-
+INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
+TMP_REMOTE="git@github.com:${OWNER_NAME}/lettuce-pre-monorepo.git"
+TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 # Step 1: Freshly clone ${PROJECT_NAME} in a tmp dir
-git clone git@github.com:${OWNER_NAME}/${PROJECT_NAME}.git $TMP_DIR/${PROJECT_NAME}
+git clone git@github.com:${OWNER_NAME}/${PROJECT_NAME}.git ${TMP_CLONE_PATH}
 
 # Step 2: Rewrite history ✊ via `git filter-repo` command.
 #         First reword every commit whose python code executes *without error*. The callback uses a regex to match #1337 references change to ${OWNER_NAME}/test-monorepo-1#1337.
