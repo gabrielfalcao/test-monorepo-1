@@ -131,8 +131,8 @@ if temporary_remote_already_exists_in_monorepo; then
     existing_tmp_remote=$(determine_push_url_of_git_remote "${TMP_REMOTE_NAME}")
     if  [ "${existing_tmp_remote}" != "${TMP_REMOTE}" ]; then
         echo "WARNING: Replacing remote url from '$existing_tmp_remote' to '$TMP_REMOTE'"
-        git remote rm "${TMP_REMOTE_NAME}"
     fi
+    git remote rm "${TMP_REMOTE_NAME}"
 fi
 git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
 
