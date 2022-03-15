@@ -168,7 +168,7 @@ if integration_branch_already_exists; then
     # the target project path and appending the project name to a text
     # file containing the $PROJECT_NAME
     rm -rf projects/${PROJECT_NAME}
-    echo -e "\n${PROJECT_NAME}" >> projects/with-pre-existing-integration-branch.txt
+    echo -e "\n${PROJECT_NAME}" >> projects-with-pre-existing-integration-branch.txt
 
     # Finally, we make a commit with the pre-integration changes.
     git add .
@@ -181,8 +181,8 @@ else # Branch does not exist yet, let's create it
     # here for the sake of illustrating a scenario where it *does not*
     # exist yet.
 
-    # Again, this is a contrived example, so let's just add the $PROJECT_NAME to some file
-    echo -e "\n${PROJECT_NAME}" >> projects/without-pre-existing-integration-branch.txt
+    # Again, this is a contrived example, so let's just add the $PROJECT_NAME to some dummy file
+    echo -e "\n${PROJECT_NAME}" >> projects-without-pre-existing-integration-branch.txt
 
     # Finally, we make a commit with the pre-integration changes.
     git add .
