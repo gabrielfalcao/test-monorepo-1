@@ -168,7 +168,7 @@ fi
 
 
 # Step 7: *Magic Step* -> `--allow-unrelated-histories`
-git merge --squash --allow-unrelated-histories ${TMP_REMOTE_NAME}/master
+git merge --allow-unrelated-histories ${TMP_REMOTE_NAME}/${FINAL_MONOREPO_BRANCH_TARGET}
 echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
 successfully imported into the monorepo under the integration branch:
 ${INTEGRATION_BRANCH_NAME}"
