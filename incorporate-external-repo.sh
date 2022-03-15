@@ -35,8 +35,8 @@ set -e
 #  | || |\  |  __/| |_| | | |  ___) |
 # |___|_| \_|_|    \___/  |_| |____/
 
-FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH="no"   # set to "yes"
-MAIN_INTEGRATION_BRANCH_NAME="main"  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
+FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH="yes"   # set to "yes"
+MAIN_INTEGRATION_BRANCH_NAME="lettuce-stuff"  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
 MONOREPO_PATH="$(pwd)"
 TMP_DIR="$(mktemp -d)"
 
