@@ -137,7 +137,10 @@ if temporary_remote_already_exists_in_monorepo; then
 fi
 git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
 
-# Step 6: If integration branch exists
+# Step 6: Fetch the whole history of a specific branch from TMP_REMOTE
+git fetch ${TMP_REMOTE_NAME} ${UPSTREAMS_MAIN_BRANCH_NAME}
+
+# Step 7: If integration branch exists
 if integration_branch_already_exists; then
 
     # Go to integration branch and perform any work you deem necessary prior to integrating "pulling" the code from the upstream remote (i.e.: $TMP_REMOTE)
@@ -173,19 +176,19 @@ else # Branch does not exist yet, let's create it
 fi
 
 
-# Step 7: *Magic Step* -> `--allow-unrelated-histories`
+# Step 8: *Magic Step* -> `--allow-unrelated-histories`
 git merge --allow-unrelated-histories ${TMP_REMOTE_NAME}/${UPSTREAMS_MAIN_BRANCH_NAME}
 echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
 successfully imported into the monorepo under the integration branch:
 ${INTEGRATION_BRANCH_NAME}"
 
-# Step 8: Go back to monorepo branch: main
+# Step 9: Go back to monorepo branch: main
 git checkout ${FINAL_MONOREPO_BRANCH_TARGET}
 
-# Step 9: Merge the integration branch into main
+# Step 10: Merge the integration branch into main
 git merge ${INTEGRATION_BRANCH_NAME}
 
-# Step 10: Explain the next manual steps
+# And we're done automating the steps, now we explain the next (manual) steps
 echo "Now inspect your history, if everything looks fine, push to github"
 echo "so that you can browse the final product and show of to your girlfriends"
 # 5. push up that branch that has the new history and take another look at it
