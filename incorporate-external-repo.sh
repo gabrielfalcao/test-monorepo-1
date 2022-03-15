@@ -7,6 +7,7 @@
 # Make sure you have the following tools installed:
 # - Git version 2.35 or newer
 # - The git-filter-repo tool: brew install git-filter-repo
+tput clear
 set -ex
 
 #   ___ ___  _  _ ___ ___ ___
