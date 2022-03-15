@@ -35,7 +35,7 @@ set -e
 #  | || |\  |  __/| |_| | | |  ___) |
 # |___|_| \_|_|    \___/  |_| |____/
 
-FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH="yes"   # set to "yes"
+FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH="no"   # set to "yes"
 MAIN_INTEGRATION_BRANCH_NAME="main"  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
 MONOREPO_PATH="$(pwd)"
 TMP_DIR="$(mktemp -d)"
@@ -189,7 +189,7 @@ if integration_branch_already_exists; then
     # Finally, we make a commit with the pre-integration changes.
     git add .
     git commit -am "fix(${PROJECT_NAME}): downstream changes required for migration"
-else # Branch does not exist yet, let's create it
+else # Branch does not exist yet, let's create one and switch to it
     git checkout -b ${HISTORY_INTEGRATION_BRANCH_NAME}
 
     # This script was originally designed to work only with an
