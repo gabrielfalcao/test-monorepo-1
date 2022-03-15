@@ -4,7 +4,17 @@
 #
 # THIS SCRIPT SHOULD BE RUN ONLY DURING A CODE FREEZE!!
 #
+# Make sure you have the following tools installed:
+# - Git version 2.35 or newer
+# - The git-filter-repo tool: brew install git-filter-repo
 set -ex
+
+if ! which git-filter-repo > /dev/null; then
+    echo -e "git-filter-repo doesn't seem to be installed.\n"
+    echo "To install it, follow the instructions in the link below:"
+    echo "https://github.com/newren/git-filter-repo/blob/main/INSTALL.md"
+    exit 1
+fi
 
 TMP_DIR=$(mktemp -d)
 OWNER_NAME=gabrielfalcao
