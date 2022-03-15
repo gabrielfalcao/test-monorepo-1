@@ -38,10 +38,10 @@ BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
 # | __| | | | \| |/ __|_   _|_ _/ _ \| \| / __|
 # | _|| |_| | .` | (__  | |  | | (_) | .` \__ \
 # |_|  \___/|_|\_|\___| |_| |___\___/|_|\_|___/
-function branch_exists() {
+function integration_branch_already_exists() {
     git branch --list | grep "[[:space:]]\+\b${INTEGRATION_BRANCH_NAME}\$" > /dev/null
 }
-function remote_exists() {
+function temporary_remote_already_exists() {
     git remote show | grep "^${TMP_REMOTE_NAME}\$" > /dev/null
 }
 
@@ -115,18 +115,21 @@ time git filter-repo \
     | tee ${BENCHMARK_LOG}  # Benchmarking to test the hypothesis that the command might run faster if the python code within the `--commit-callback` command handles errors properly.
 
 # Step 3: Push to temporary remote
-git remote add temp-remote ${TMP_REMOTE}
-git push --force --all temp-remote
+if ! temporary_remote_already_exists; then
+    git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
+fi
+git push --force --all ${TMP_REMOTE_NAME}
 
 
 # Step 4: Go to monorepo
 pushd "${MONOREPO_PATH}"
 
 # Step 5: Add ${PROJECT_NAME}'s temporary remote to the monorepo
+
 git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
 
 # Step 6: If integration branch exists
-if branch_exists ${INTEGRATION_BRANCH_NAME}; then
+if integration_branch_already_exists; then
 
     # Go to integration branch and perform any work you deem necessary prior to integrating "pulling" the code from the upstream remote (i.e.: $TMP_REMOTE)
 
