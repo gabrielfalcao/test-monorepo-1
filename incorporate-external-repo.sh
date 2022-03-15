@@ -73,6 +73,12 @@ function determine_push_url_of_git_remote() {
     name="$@"
     git remote show -n "${name}" | grep -i 'push.*url' | awk '{ print $NF }'
 }
+function log_ok() {
+    echo -e "\033[1;32m${@}\033[0m"
+}
+function log_err() {
+    echo -e "\033[1;32m${@}\033[0m"
+}
 #########################################################################
 
 #########################################################################
@@ -86,15 +92,15 @@ function determine_push_url_of_git_remote() {
 #  \___|_||_|___\___|_|\_\___/
 
 if ! git diff --quiet; then
-    echo "The Git tree is dirty!!"
-    echo "Make sure that to commit AND push all changes before running this migration script."
+    log_err "The Git tree is dirty!!"
+    log_err "Make sure that to commit AND push all changes before running this migration script."
     exit 1
 fi
 
 if ! which git-filter-repo > /dev/null; then
-    echo -e "git-filter-repo doesn't seem to be installed.\n"
-    echo "To install it you can follow the instructions in the link below:"
-    echo "https://github.com/newren/git-filter-repo/blob/main/INSTALL.md"
+    log_err "git-filter-repo doesn't seem to be installed.\n"
+    log_err "To install it you can follow the instructions in the link below:"
+    log_err "https://github.com/newren/git-filter-repo/blob/main/INSTALL.md"
     echo ""
     echo "Tip: Mac users can simply run:"
     echo -e "\tbrew install git-filter-repo"
@@ -154,7 +160,7 @@ pushd "${MONOREPO_PATH}"
 if temporary_remote_already_exists_in_monorepo; then
     existing_tmp_remote=$(determine_push_url_of_git_remote "${TMP_REMOTE_NAME}")
     if  [ "${existing_tmp_remote}" != "${TMP_REMOTE}" ]; then
-        echo "WARNING: Replacing remote url from '$existing_tmp_remote' to '$TMP_REMOTE'"
+        log_err "WARNING: Replacing remote url from '$existing_tmp_remote' to '$TMP_REMOTE'"
     fi
     git remote rm "${TMP_REMOTE_NAME}"
 fi
@@ -177,7 +183,7 @@ if integration_branch_already_exists; then
     # the target project path and appending the project name to a text
     # file containing the $PROJECT_NAME
     rm -rf projects/${PROJECT_NAME}
-    echo -e "\n${PROJECT_NAME}" >> projects-with-pre-existing-integration-branch.txt
+    echo "${PROJECT_NAME}" >> projects-with-pre-existing-integration-branch.txt
 
     # Finally, we make a commit with the pre-integration changes.
     git add .
@@ -191,7 +197,7 @@ else # Branch does not exist yet, let's create it
     # exist yet.
 
     # Again, this is a contrived example, so let's just add the $PROJECT_NAME to some dummy file
-    echo -e "\n${PROJECT_NAME}" >> projects-without-pre-existing-integration-branch.txt
+    echo "${PROJECT_NAME}" >> projects-without-pre-existing-integration-branch.txt
 
     # Finally, we make a commit with the pre-integration changes.
     git add .
@@ -202,7 +208,7 @@ fi
 # Step 8: *Magic Step* -> `--allow-unrelated-histories`
 git merge --allow-unrelated-histories --no-commit ${TMP_REMOTE_NAME}/${UPSTREAMS_MAIN_BRANCH_NAME}
 git commit -am "Migrated ${OWNER_NAME}/${PROJECT_NAME} into the monorepo."
-echo -e "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
+log_ok "The history of ${OWNER_NAME}/${PROJECT_NAME} has been
 successfully imported into the monorepo under the integration branch:
 ${HISTORY_INTEGRATION_BRANCH_NAME}"
 
@@ -213,16 +219,16 @@ ${HISTORY_INTEGRATION_BRANCH_NAME}"
 if [ "${FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH}" == "yes" ]; then
     git checkout ${MAIN_INTEGRATION_BRANCH_NAME}
     git merge ${HISTORY_INTEGRATION_BRANCH_NAME}
-    echo "Hurray! The upstream code has been successfully incorported into the local '${MAIN_INTEGRATION_BRANCH_NAME}' branch."
-    echo "Now inspect your history with 'git log' to confirm that it looks good."
-    echo "Once that's done, run 'git push'."
+    log_ok "Hurray! The upstream code has been successfully incorported into the local '${MAIN_INTEGRATION_BRANCH_NAME}' branch."
+    log_ok "Now inspect your history with 'git log' to confirm that it looks good."
+    log_ok "Once that's done, run 'git push'."
 else
-    echo "Now inspect your history with 'git log' to confirm that the migration worked fine"
-    echo "Once that's done, switch to the main branch of the monorepo and run 'git merge'."
-    echo
-    echo "Here is the exact list of commands:"
+    log_ok "Now inspect your history with 'git log' to confirm that the migration worked fine"
+    log_ok "Once that's done, switch to the main branch of the monorepo and run 'git merge'."
+    log_ok
+    log_ok "Here is the exact list of commands:"
 
-    echo "git checkout ${MAIN_INTEGRATION_BRANCH_NAME}"
-    echo "git merge ${HISTORY_INTEGRATION_BRANCH_NAME}"
+    log_ok "git checkout ${MAIN_INTEGRATION_BRANCH_NAME}"
+    log_ok "git merge ${HISTORY_INTEGRATION_BRANCH_NAME}"
 fi
 #########################################################################
