@@ -28,7 +28,7 @@ INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
 TMP_REMOTE="git@github.com:${OWNER_NAME}/${PROJECT_NAME}-pre-monorepo.git"
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
 TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
-BENCHMARK_LOG=$(mktemp -d)/benchmark.txt
+BENCHMARK_LOG="${TMP_DIR}/benchmark.txt"
 
 #  _  _ ___ _    ___ ___ ___
 # | || | __| |  | _ \ __| _ \
