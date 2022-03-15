@@ -62,8 +62,7 @@ pushd "${MONOREPO_PATH}"
 git remote add ${TMP_REMOTE_NAME} ${TMP_REMOTE}
 
 # Step 6: Create integration branch
-git branch -D ${INTEGRATION_BRANCH_NAME}
-git branch ${INTEGRATION_BRANCH_NAME}
+git branch --force ${INTEGRATION_BRANCH_NAME}
 
 # Step 7: Go to integration branch
 git checkout ${INTEGRATION_BRANCH_NAME}
