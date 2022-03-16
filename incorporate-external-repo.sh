@@ -20,7 +20,7 @@ tput clear
 #
 # TIP: you might want to change the line below to "set -ex" to have
 # bash print every single command
-set -e
+set -ex
 #########################################################################
 
 #########################################################################
