@@ -36,20 +36,25 @@ set -e
 # |___|_| \_|_|    \___/  |_| |____/
 
 FINALIZE_LOCAL_MERGE_TO_MAIN_INTEGRATION_BRANCH="yes"   # set to "yes"
-MAIN_INTEGRATION_BRANCH_NAME="lettuce-stuff"  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
+MAIN_INTEGRATION_BRANCH_NAME="main"  # NOTE: Preferably on something other than the `main` branch, maybe create a "staging" branch...
+
+# MONOREPO_PATH: The script assumes that it is being run from within the monorepo root, if that's not the case you must change this
 MONOREPO_PATH="$(pwd)"
+
+# TMP_DIR: The script creates a temporary directory to serve as sandbox where it will put 2 things: a fresh clone of the upstream monorepo ($TMP_CLONE_PATH) and a freshly created "bare" git repository that will serve as temporary "git remote" from whence the monorepo will fetch the history ($TMP_REMOTE_PATH).
 TMP_DIR="$(mktemp -d)"
+TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
+TMP_REMOTE_PATH="${TMP_DIR}/tmp-remote.git"
 
 # <upstream project info>
 OWNER_NAME="gabrielfalcao"
 PROJECT_NAME="lettuce"
-UPSTREAMS_MAIN_BRANCH_NAME=master  # this should be "main" for newer github projects or "master" for old ones :/
+UPSTREAMS_MAIN_BRANCH_NAME=master  # this could be "main" for newer github projects or "master" for old ones.
 # </upstream project info>
 
-HISTORY_INTEGRATION_BRANCH_NAME="integrate-${PROJECT_NAME}"
-TMP_REMOTE="git@github.com:${OWNER_NAME}/${PROJECT_NAME}-pre-monorepo.git"
+HISTORY_INTEGRATION_BRANCH_NAME="import-${PROJECT_NAME}-with-history"
+TMP_REMOTE="file://${TMP_REMOTE_PATH}" # the rewritten will be pushed to this remote, which is just a local path. Thanks to git supporting file:// URIs :)
 TMP_REMOTE_NAME="${PROJECT_NAME}-pre-monorepo"
-TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 #########################################################################
 
 
@@ -150,8 +155,9 @@ git filter-repo \
     --path-rename projects/${PROJECT_NAME}/.github/:.artifacts/${PROJECT_NAME}/.github/
 
 # Step 3: Push to temporary remote
-git remote add temp-remote ${TMP_REMOTE}
-git push --force --all temp-remote
+git init --bare ${TMP_REMOTE_PATH}  # create temporary remote in the filesystem
+git remote add temp-remote ${TMP_REMOTE} # add to temporary remote to the local copy of the upstream whose history we just rewrote
+git push temp-remote ${UPSTREAMS_MAIN_BRANCH_NAME} # push the branch containing the rewritten history to the temporary remote
 
 # Step 4: Go to monorepo
 pushd "${MONOREPO_PATH}"
