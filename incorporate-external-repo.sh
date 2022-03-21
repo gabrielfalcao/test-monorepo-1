@@ -47,9 +47,9 @@ TMP_CLONE_PATH="${TMP_DIR}/${PROJECT_NAME}"
 TMP_REMOTE_PATH="${TMP_DIR}/tmp-remote.git"
 
 # <upstream project info>
-OWNER_NAME="gabrielfalcao"
-PROJECT_NAME="lettuce"
-UPSTREAMS_MAIN_BRANCH_NAME=master  # this could be "main" for newer github projects or "master" for old ones.
+OWNER_NAME="nytm"
+PROJECT_NAME="wf-project-vi"
+UPSTREAMS_MAIN_BRANCH_NAME=main  # this could be "main" for newer github projects or "master" for old ones.
 # </upstream project info>
 
 HISTORY_INTEGRATION_BRANCH_NAME="import-${PROJECT_NAME}-with-history"
@@ -145,14 +145,12 @@ git filter-repo \
         lambda m: b'(${OWNER_NAME}/${PROJECT_NAME}#%b)' % m.group(1),
         commit.message
     )
-    commit.message += (b'\nMigrated to ${OWNER_NAME}/test-monorepo-1 from ${OWNER_NAME}/${PROJECT_NAME}@%s'
+    commit.message += (b'\nMigrated to nytimes/news from ${OWNER_NAME}/${PROJECT_NAME}@%s'
         % commit.original_id[0:7])
     " \
     --path-rename :projects/${PROJECT_NAME}/ \
-    --path-rename projects/${PROJECT_NAME}/tests/:tests/${PROJECT_NAME}/ \
-    --path-rename projects/${PROJECT_NAME}/.travis.yml:.artifacts/${PROJECT_NAME}/.travis.yml \
-    --path-rename projects/${PROJECT_NAME}/tox.ini:.artifacts/${PROJECT_NAME}/tox.ini \
-    --path-rename projects/${PROJECT_NAME}/.github/:.artifacts/${PROJECT_NAME}/.github/
+    --path-rename projects/${PROJECT_NAME}/.drone.yml:.artifacts/${PROJECT_NAME}/.drone.yml \
+    --path-rename projects/${PROJECT_NAME}/.drone/:.artifacts/${PROJECT_NAME}/.drone/
 
 # Step 3: Push to temporary remote
 git init --bare ${TMP_REMOTE_PATH}  # create temporary remote in the filesystem
